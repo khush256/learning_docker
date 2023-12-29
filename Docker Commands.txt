@@ -1,0 +1,65 @@
+sudo docker run hello-world 
+sudo docker login 
+sudo docker build . -t <image name>  (create images)
+sudo docker images
+sudo docker run -p 3000:3000 test_app (p -> port mapping) (run -> creates container)
+
+To kill the docker container:
+   sudo docker stop <container_id>
+	or
+   sudo docker kill <container_id>
+	or
+   ps aux | grep docker 
+   kill -9 [process_id]
+
+sudo docker ps (shows all the running containers)
+sudo docker push <image_name>
+sudo docker pull <image_name>
+
+sudo docker rmi -f <image_id> 
+or            (to remove images and -f to forcefully remove)
+sudo docker rmi <image_name> --force
+
+sudo docker exec -it <container_id> /bin/bash (allows to go inside container)
+
+<-- Volumes and Networks -->
+sudo docker volume create <volume_name>
+sudo docker volume ls (show all volumes)
+sudo docker run -v volumekp:/data/db -p 27017:27017 mongo (added volume to mongo)
+sudo docker run -p 27017:27017 mongo (running mongo image without adding volume)
+sudo docker volume rm <volume_name>
+sudo docker network create <network_name>
+sudo docker network ls (show all networks) 
+sudo docker run -p 27017:27017 --name mongodb3 --network network_kp mongo (--name giving name to container to identify in network)
+sudo docker run -p 3000:3000 --network network_kp test4
+
+<-- using Environment variables -->
+sudo docker run -p 3000:3000 --network network_kp -e MONGO_URI="mongodb://mongodb1:27017/mydatabase" test1 (-e to inject variables)
+
+<-- Dockerfile  -->  
+
+FROM node:20 AS base
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+
+FROM base AS development
+COPY . .
+CMD ["npm", "run", "dev"]
+
+FROM base AS production
+COPY . .
+RUN npm prune --production
+CMD ["npm", "run", "start"]
+
+<-- Dockerfile  -->
+
+sudo docker build . --target development -t app:dev (--target to run specific docker code in dockerfile here it's development)
+
+sudo docker build . --target production -t app:prod (--target to run specific docker code in dockerfile here it's production)
+
+sudo docker run -e MONGO_URI=mongodb://localhost:27017/mydatabase -p 3000:3000 -v .:/usr/src/app myapp:dev (adding whole files as volume in through -v)
+
+sudo docker run -d mongo (run in detached mode so that terminal not hung at only one process)
+
+sudo docker-compose up (to run multiple containers defined in yaml file)
